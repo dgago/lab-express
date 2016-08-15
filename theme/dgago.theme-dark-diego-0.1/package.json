@@ -1,0 +1,42 @@
+{
+	"name": "theme-dark-diego",
+	"displayName": "dark-diego",
+	"description": "",
+	"version": "0.0.1",
+	"publisher": "diego",
+	"engines": {
+		"vscode": "^1.0.0"
+	},
+	"categories": [
+		"Themes"
+	],
+	"contributes": {
+		"themes": [
+			{
+				"label": "Dark+ Diego",
+				"uiTheme": "vs-dark",
+				"path": "./themes/dark_plus.json"
+			},
+			{
+				"label": "Light+ Diego",
+				"uiTheme": "vs",
+				"path": "./themes/light_plus.json"
+			},
+			{
+				"label": "Dark Diego",
+				"uiTheme": "vs-dark",
+				"path": "./themes/dark_vs.json"
+			},
+			{
+				"label": "Light Diego",
+				"uiTheme": "vs",
+				"path": "./themes/light_vs.json"
+			},
+			{
+				"label": "High Contrast Diego",
+				"uiTheme": "hc-black",
+				"path": "./themes/hc_black.json"
+			}
+		]
+	}
+}
