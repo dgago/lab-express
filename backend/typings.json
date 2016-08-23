@@ -6,6 +6,8 @@
     "express-serve-static-core": "registry:dt/express-serve-static-core#4.0.0+20160805091045",
     "mime": "registry:dt/mime#0.0.0+20160316155526",
     "node": "registry:dt/node#6.0.0+20160807145350",
+    "passport": "registry:dt/passport#0.2.0+20160720063208",
+    "passport-jwt": "registry:dt/passport-jwt#2.0.0+20160330163949",
     "serve-static": "registry:dt/serve-static#0.0.0+20160606155157"
   }
 }
