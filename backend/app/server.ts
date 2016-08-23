@@ -1,7 +1,9 @@
 /// <reference path="../typings/index.d.ts" />
 
 import express = require('express');
-import path = require('path');
+import routes = require('./routes');
+
+const parser = require('body-parser');
 
 // express app
 let app = express();
@@ -13,12 +15,23 @@ let logger = function (req, res, next) {
 }
 app.use(logger);
 
-// routing
-app.get('/jobs', function (req:express.Request, res:express.Response) {
-	res.send('GET jobs.');
+// body parser
+app.use(parser.urlencoded({ extended: true }));
+app.use(parser.json());
+
+// routes
+routes.default(app);
+
+// redirect unmatched
+app.use(function (req, res) {
+	console.log('Unmatched path: ' + req.path);
+	res.status(400).send({ error: 'Unmatched path: ' + req.path });
 });
-app.get('/jobs/:id', function (req:express.Request, res:express.Response) {
-	res.send('GET one job: ' + req.params.id);
+
+// exceptions
+app.use(function (err: express.ErrorRequestHandler, req: express.Request, res: express.Response, next: express.NextFunction) {
+	console.log('error', err);
+	res.status(400).send(err);
 });
 
 // server

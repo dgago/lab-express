@@ -1,50 +1,24 @@
 import passport = require('passport');
-import passportJwt = require('passport-jwt');
+import jwt = require('passport-jwt');
 
 import {User, UserManager} from './users';
 import {Config} from './config';
 
-// app config
-let cfg = new Config();
+export default function (passport: passport.Passport): void {
+	let umgr: UserManager = new UserManager();
 
-// passport setup
-let ExtractJwt = passportJwt.ExtractJwt;
-let passOptions: passportJwt.StrategyOptions = {
-	jwtFromRequest: ExtractJwt.fromAuthHeader(),
-	secretOrKey: cfg.jwt.secret
-};
-
-export class Auth {
-	private umgr: UserManager = new UserManager();
-	private ppt = passport;
-
-	private strategy = ()=>(passOptions, function (payload, done) {
-		let user = this.umgr.find(payload.username);
+	let opts: jwt.StrategyOptions = {
+		jwtFromRequest: jwt.ExtractJwt.fromAuthHeader(),
+		secretOrKey: Config.jwt.secret
+	};
+	let strategy = new jwt.Strategy(opts, function (payload: any, done: jwt.VerifiedCallback) {
+		let user = umgr.findOne(payload.username);
 		if (user) {
-			return done(null, { id: user.id });
-		} else {
-			return done(new Error("User not found"), null);
-		}
+            done(null, user);
+        } else {
+            done(null, false);
+        }
 	});
 
-	public initialize() {
-		let st :passport.Strategy;
-
-		this.ppt.use(st);
-		return this.ppt.initialize();
-	}
-
-}
-
-
-module.exports = function () {
 	passport.use(strategy);
-	return {
-		initialize: function () {
-			return passport.initialize();
-		},
-		authenticate: function () {
-			return passport.authenticate("jwt", cfg.jwtSession);
-		}
-	};
-};
+}

@@ -1,6 +1,6 @@
-export class Config {
-	public jwt: any = {
+export const Config = {
+	jwt: {
 		secret: 'secret-key',
 		session: { session: false }
-	};
+	}
 }
