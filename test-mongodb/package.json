@@ -1,0 +1,25 @@
+{
+  "name": "test-mongodb",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "mongodb"
+  ],
+  "author": "dgago",
+  "license": "ISC",
+  "dependencies": {
+    "mongodb": "^2.2.10"
+  },
+  "devDependencies": {
+    "concurrently": "^2.2.0",
+    "del": "^2.2.2",
+    "gulp": "^3.9.1",
+    "gulp-nodemon": "^2.1.0",
+    "gulp-typescript": "^2.13.6",
+    "typings": "^1.3.3"
+  }
+}
