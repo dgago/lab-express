@@ -1,27 +1,16 @@
-interface Callback<T> {
-	(error: any, result: T);
+export interface IEntity {
+	_id: any
 }
 
-interface IStore<T, K> {
-	findOne(query: any, callback: Callback<T>);
-	find(query: any, callback: Callback<Array<T>>);
-	findAll(callback: Callback<Array<T>>);
+export interface IStore<T extends IEntity, K> {
+	findOne(query: Object, sort: Object): Promise<T>;
+	find(query: Object, sort: Object, skip: number, limit: number): Promise<T>;
+	findAll(sort: Object, skip: number, limit: number): Promise<T>;
 
-	findOne(query: any, callback: Callback<T>, pageSize: number, pageIndex: number);
-	find(query: any, callback: Callback<Array<T>>, pageSize: number, pageIndex: number);
-	findAll(callback: Callback<Array<T>>, pageSize: number, pageIndex: number);
+	findById(id: K): Promise<T>;
+	exists(query: Object): Promise<boolean>;
 
-	findOne(query: any, callback: Callback<T>, sort: any);
-	find(query: any, callback: Callback<Array<T>>, sort: any);
-	findAll(callback: Callback<Array<T>>, sort: any);
-
-	findOne(query: any, callback: Callback<T>, pageSize: number, pageIndex: number, sort: any);
-	find(query: any, callback: Callback<Array<T>>, pageSize: number, pageIndex: number, sort: any);
-	findAll(callback: Callback<Array<T>>, pageSize: number, pageIndex: number, sort: any);
-
-	findOne(id: K, callback: Callback<T>);
-	create(item: T): K;
-	update(item: T);
-	remove(itemId: K);
-	exists(query: any): boolean;
+	create(item: T): Promise<K>;
+	update(item: T): Promise<any>;
+	remove(itemId: K): Promise<any>;
 }
