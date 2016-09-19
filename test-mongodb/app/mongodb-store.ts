@@ -1,9 +1,15 @@
 import store = require('./store');
 import mongodb = require('mongodb');
 
+/**
+ * Implementación de IStore para MongoDb.
+ */
 export abstract class MongoDbStore<T extends store.IEntity, K> implements store.IStore<T, K> {
 	protected Collection: mongodb.Collection;
 
+	/**
+	 * Constructor de la clase.
+	 */
 	constructor(collection: mongodb.Collection) {
 		this.Collection = collection;
 	}
@@ -13,85 +19,55 @@ export abstract class MongoDbStore<T extends store.IEntity, K> implements store.
 	 * y el criterio de ordenamiento especificado.
 	 */
 	findOne(query: Object, sort: Object): Promise<T> {
-		let fn = (resolve, reject) => {
-			let cursor: mongodb.Cursor = this.Collection.find(query);
+		let cursor: mongodb.Cursor = this.Collection.find(query);
 
-			if (sort) {
-				cursor.sort(sort);
-			}
+		if (sort) {
+			cursor.sort(sort);
+		}
 
-			cursor.next(function (error: mongodb.MongoError, result: T) {
-				if (error) {
-					reject(error);
-				} else {
-					resolve(result);
-				}
-			});
-		};
-
-		return new Promise<T>(fn);
+		return cursor.next();
 	}
 
 	/**
 	 * Busca los items según un criterio de búsqueda.
 	 */
-	find(query: Object, sort: Object, skip: number, limit: number): Promise<T> {
-		let fn = (resolve, reject) => {
-			let cursor: mongodb.Cursor = this.Collection.find(query);
+	find(query: Object, sort: Object, skip: number, limit: number): Promise<T[]> {
+		let cursor: mongodb.Cursor = this.Collection.find(query);
 
-			if (sort) {
-				cursor.sort(sort);
-			}
+		if (sort) {
+			cursor.sort(sort);
+		}
 
-			if (skip) {
-				cursor.skip(skip);
-			}
+		if (skip) {
+			cursor.skip(skip);
+		}
 
-			if (limit) {
-				cursor.limit(limit);
-			}
+		if (limit) {
+			cursor.limit(limit);
+		}
 
-			cursor.toArray(function (error: mongodb.MongoError, result: Array<T>) {
-				if (error) {
-					reject(error);
-				} else {
-					resolve(result);
-				}
-			});
-		};
-
-		return new Promise<T>(fn);
+		return cursor.toArray();
 	}
 
 	/**
 	 * Busca todos los items.
 	 */
-	findAll(sort: Object, skip: number, limit: number): Promise<T> {
-		let fn = (resolve, reject) => {
-			let cursor: mongodb.Cursor = this.Collection.find();
+	findAll(sort: Object = undefined, skip: number = undefined, limit: number = undefined): Promise<T[]> {
+		let cursor: mongodb.Cursor = this.Collection.find();
 
-			if (sort) {
-				cursor.sort(sort);
-			}
+		if (sort) {
+			cursor.sort(sort);
+		}
 
-			if (skip) {
-				cursor.skip(skip);
-			}
+		if (skip) {
+			cursor.skip(skip);
+		}
 
-			if (limit) {
-				cursor.limit(limit);
-			}
+		if (limit) {
+			cursor.limit(limit);
+		}
 
-			cursor.toArray((error: mongodb.MongoError, result: Array<T>) => {
-				if (error) {
-					reject(error);
-				} else {
-					resolve(result);
-				}
-			});
-		};
-
-		return new Promise<T>(fn);
+		return cursor.toArray();
 	}
 
 	/**
@@ -121,6 +97,8 @@ export abstract class MongoDbStore<T extends store.IEntity, K> implements store.
 			});
 		};
 
+		// es necesario crear una nueva promesa para cumplir con
+		// la restricción de poder devolver la clave al crear
 		return new Promise<K>(fn);
 	}
 
@@ -137,4 +115,37 @@ export abstract class MongoDbStore<T extends store.IEntity, K> implements store.
 	remove(itemId: K): Promise<any> {
 		return this.Collection.remove({ _id: itemId });
 	}
+}
+
+/**
+ * Contexto de conexión con la base de datos, que permite obtener 
+ * acceso a los stores sin conocer los detalles de conexión.
+ */
+export abstract class MongoDbContext extends store.DbContext {
+	protected database: mongodb.Db;
+
+	constructor(connectionString: string) {
+		super(connectionString);
+	}
+
+	connect(): Promise<any> {
+		let client: mongodb.MongoClient = require('mongodb').MongoClient;
+
+		let fnConnected = (db: mongodb.Db) => {
+			this.database = db;
+
+			this.createStores();
+		};
+
+		return client.connect(this.connectionString)
+			.then(fnConnected);
+	}
+
+	close(): Promise<any> {
+		if (this.database) {
+			return this.database.close();
+		}
+	}
+
+	protected abstract createStores();
 }
