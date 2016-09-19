@@ -1,5 +1,6 @@
 /// <reference path="../typings/index.d.ts" />
 
+import http = require('http');
 import express = require('express');
 import routes = require('./routes');
 
@@ -36,9 +37,13 @@ app.use(function (err: express.ErrorRequestHandler, req: express.Request, res: e
 
 // server
 let port: number = process.env.PORT || 3000;
-let server = app.listen(port, function () {
+let server: http.Server = app.listen(port, function () {
 	let host = server.address().address;
 	let port = server.address().port;
 
 	console.log('Listening on port ' + port);
+});
+
+server.on('close', () => {
+	console.log('Server closing...');
 });
